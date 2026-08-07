@@ -179,10 +179,10 @@ The app should now be running at `http://localhost:3000` (frontend) with the bac
 
 | Name | Role |
 |------|------|
-| —    | Frontend |
-| —    | Backend |
-| —    | ML |
-| —    | Database/Deployment |
+| Aman Pokharia , Ridhima Bhatt   | Frontend |
+| Amrit Raj Yadav , Samarth Chaudhary   | Backend |
+| Kartik Tiwari    | ML |
+| Kartik Sharma   | Database/Deployment |
 
 *(Fill in your team members and roles.)*
 
