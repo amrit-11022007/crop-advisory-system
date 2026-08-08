@@ -2,7 +2,8 @@ from django.db import models
 
 class Farmer(models.Model):
     name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15, unique=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
