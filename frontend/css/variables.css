@@ -1,4 +1,4 @@
-/* variables.css – design tokens for Fasal Sathi login */
+/* variables.css – design tokens for Fasal Sathi */
 :root {
   /* Primary brand colors */
   --color-primary: #1f6e32;
@@ -54,4 +54,18 @@
   /* Misc */
   --border-width-input: 1.5px;
   --opacity-white-border: 0.2;
+}
+
+/* App theme variables */
+:root {
+  --bg-main: #f3f3eb;
+  --bg-sidebar: #f8f8f2;
+  --bg-card: #ffffff;
+  --text-dark: #222521;
+  --text-muted: #6b7265;
+  --brand-green: #3b5c10;
+  --brand-light: #e7ebd9;
+  --badge-bg: #dbeafe;
+  --badge-text: #1d4ed8;
+  --border-light: #e2e8f0;
 }
