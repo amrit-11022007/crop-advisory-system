@@ -1,30 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("loginForm");
+  const nameInput = document.getElementById("nameInput");
   const emailInput = document.getElementById("emailInput");
   const passwordInput = document.getElementById("passwordInput");
 
-  if (!loginForm || !emailInput || !passwordInput) {
+  if (!registerForm || !nameInput || !emailInput || !passwordInput) {
     return;
   }
 
-  loginForm.addEventListener("submit", async (e) => {
+  registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
-    if (!email || !password) {
-      alert("Please enter both email and password.");
+    if (!name || !email || !password) {
+      alert("Please enter all the details.");
       return;
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login/", {
+      const response = await fetch("http://127.0.0.1:8000/api/register/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
@@ -40,10 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem("user", JSON.stringify(safeUser));
 
-        alert("Login successful!");
+        alert("Registration successful!");
         window.location.href = "index.html";
       } else {
-        alert(data.error || "Login failed. Please check your credentials.");
+        alert(data.error || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error connecting to backend:", error);
