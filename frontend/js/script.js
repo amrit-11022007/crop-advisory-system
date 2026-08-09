@@ -1,5 +1,27 @@
 // app.js - Main application functionality with animated mobile sidebar
 document.addEventListener("DOMContentLoaded", () => {
+  const userNameElement = document.getElementById("userName");
+  const avatarElement = document.getElementById("avatar");
+
+  let storedUser = null;
+
+  try {
+    const rawUser = localStorage.getItem("user");
+    storedUser = rawUser ? JSON.parse(rawUser) : null;
+  } catch (error) {
+    console.warn("Unable to parse stored user profile.", error);
+    storedUser = null;
+  }
+
+  if (userNameElement) {
+    const safeUserName = storedUser?.name || storedUser?.username || "Guest";
+    userNameElement.innerText = safeUserName;
+  }
+
+  if (avatarElement) {
+    avatarElement.innerText = "G";
+  }
+
   // ==================== DOM ELEMENTS ====================
   const sidebar = document.getElementById("sidebar");
   const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -135,8 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       if (confirm("Are you sure you want to log out?")) {
+        localStorage.removeItem("user");
         console.log("User logged out.");
-        window.location.href = "index.html";
+        window.location.href = "login.html";
       }
     });
   }
