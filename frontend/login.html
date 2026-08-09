@@ -20,20 +20,31 @@
 
         <form class="login-form" id="loginForm">
           <div class="input-group">
-            <label for="mobileInput">Phone number</label>
+            <label for="emailInput">Email Address</label>
             <div class="input-wrapper">
               <input
-                type="tel"
-                id="mobileInput"
-                placeholder="Enter your mobile number"
-                value="+91"
+                type="email"
+                id="emailInput"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="passwordInput">Password</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="passwordInput"
+                placeholder="Enter your password"
                 required
               />
             </div>
           </div>
 
           <button type="submit" class="btn-otp">
-            <i class="fas fa-paper-plane"></i> Send OTP
+            <i class="fas fa-sign-in-alt"></i> Login
           </button>
 
           <div class="language-selector">

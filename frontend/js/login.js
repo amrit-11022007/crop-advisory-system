@@ -1,40 +1,40 @@
-// login.js - Login page functionality
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
-  const mobileInput = document.getElementById("mobileInput");
+  const emailInput = document.getElementById("emailInput");
+  const passwordInput = document.getElementById("passwordInput");
 
-  loginForm.addEventListener("submit", (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const phoneNumber = mobileInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-    if (phoneNumber && phoneNumber.length >= 10) {
-      // Simulate OTP sending
-      console.log("Sending OTP to:", phoneNumber);
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
 
-      // Redirect to dashboard after successful login
-      setTimeout(() => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Login successful!");
+        localStorage.setItem("user", JSON.stringify(data.user));
         window.location.href = "dashboard.html";
-      }, 1000);
-    } else {
-      alert("Please enter a valid phone number");
+      } else {
+        alert(data.error || "Login failed. Please check your credentials.");
+      }
+    } catch (error) {
+      console.error("Error connecting to backend:", error);
+      alert("Cannot connect to server. Ensure Django server is running on http://127.0.0.1:8000.");
     }
-  });
-
-  // Format phone number input
-  mobileInput.addEventListener("input", (e) => {
-    let value = e.target.value;
-
-    // Ensure +91 prefix stays
-    if (!value.startsWith("+91")) {
-      value = "+91" + value.replace(/[^0-9]/g, "");
-    }
-
-    // Limit to 13 characters (+91 + 10 digits)
-    if (value.length > 13) {
-      value = value.slice(0, 13);
-    }
-
-    e.target.value = value;
   });
 });
