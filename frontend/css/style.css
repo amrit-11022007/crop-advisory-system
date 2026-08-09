@@ -1,4 +1,4 @@
-/* style.css – main app styles */
+/* style.css – main app styles with animated mobile sidebar */
 @import url("variables.css");
 
 * {
@@ -13,6 +13,7 @@ body {
   background-color: var(--bg-main);
   color: var(--text-dark);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app-layout {
@@ -30,9 +31,67 @@ body {
   margin-bottom: 20px;
 }
 
-/* Utility Class to Toggle View Visibility */
 .hidden {
   display: none !important;
+}
+
+/* ==================== MOBILE HEADER ==================== */
+.mobile-header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-header .brand h2 {
+  font-size: 1.1rem;
+  color: var(--brand-green);
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--brand-green);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background-color: var(--brand-light);
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* ==================== SIDEBAR OVERLAY ==================== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity var(--transition-sidebar);
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
 }
 
 /* ==================== SIDEBAR LAYOUT & NAVIGATION ==================== */
@@ -44,7 +103,43 @@ body {
   display: flex;
   flex-direction: column;
   position: fixed;
-  height: 100%;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 300;
+  transition:
+    transform var(--transition-sidebar),
+    box-shadow var(--transition-sidebar);
+}
+
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sidebar-close-btn button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  border-radius: 8px;
+}
+
+.sidebar-close-btn button:hover {
+  color: var(--text-dark);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .brand h2 {
@@ -128,6 +223,7 @@ body {
   padding: 40px;
   max-width: 1024px;
   margin-left: 256px;
+  transition: margin-left var(--transition-sidebar);
 }
 
 .header h1,
@@ -528,40 +624,81 @@ body {
   background-color: #f3f3e9;
 }
 
+/* ==================== MOBILE BOTTOM NAVIGATION ==================== */
+.mobile-bottom-nav {
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+  z-index: 100;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  gap: 2px;
+  cursor: pointer;
+  width: 20%;
+  height: 100%;
+  transition: color 0.2s ease;
+}
+
+.mobile-nav-btn i {
+  font-size: 1.25rem;
+}
+
+.mobile-nav-btn.active {
+  color: var(--brand-green);
+  font-weight: 600;
+}
+
 /* ==================== MOBILE & TABLET RESPONSIVENESS ==================== */
 @media screen and (max-width: 768px) {
-  .app-layout {
-    flex-direction: column;
+  /* Show mobile header */
+  .mobile-header {
+    display: flex;
   }
 
+  /* Show close button in sidebar */
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  /* Hide sidebar by default on mobile */
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-    background-color: var(--bg-card);
+    transform: translateX(-100%);
   }
 
-  .sidebar .nav-menu,
-  .sidebar .user-profile {
-    display: none;
+  /* Show sidebar when open */
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
   }
 
-  .brand h2 {
-    font-size: 1.1rem;
+  /* Show overlay on mobile */
+  .sidebar-overlay {
+    display: block;
+    pointer-events: none;
   }
 
-  .brand p {
-    display: none;
+  .sidebar-overlay.active {
+    pointer-events: auto;
   }
 
+  /* Remove left margin from main content on mobile */
   .main-content {
     margin-left: 0;
     width: 100%;
@@ -569,11 +706,13 @@ body {
     max-width: 100%;
   }
 
+  /* Stack metrics vertically on mobile */
   .metrics-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
+  /* Stack settings items vertically */
   .info-item,
   .setting-item {
     flex-direction: column;
@@ -594,47 +733,29 @@ body {
     width: 100%;
   }
 
+  /* Show bottom navigation on mobile */
   .mobile-bottom-nav {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background-color: var(--bg-card);
-    border-top: 1px solid var(--border-light);
-    z-index: 1000;
-  }
-
-  .mobile-nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.7rem;
-    gap: 2px;
-    cursor: pointer;
-    width: 20%;
-    height: 100%;
-  }
-
-  .mobile-nav-btn i {
-    font-size: 1.25rem;
-  }
-
-  .mobile-nav-btn.active {
-    color: var(--brand-green);
-    font-weight: 600;
   }
 }
 
+/* Desktop styles */
 @media screen and (min-width: 769px) {
+  .mobile-header,
+  .sidebar-overlay,
   .mobile-bottom-nav {
     display: none;
+  }
+
+  .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-close-btn {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 256px;
   }
 }

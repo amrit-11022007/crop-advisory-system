@@ -17,6 +17,7 @@ The **Smart Crop Advisory System** is a full-stack web application that recommen
 ## 🎯 Problem Statement
 
 Design and develop a smart crop advisory system that:
+
 - Collects soil and environmental parameters from farmers
 - Uses ML to recommend the most suitable crop and/or fertilizer
 - Maintains a history of advisories for each farmer
@@ -31,7 +32,6 @@ Design and develop a smart crop advisory system that:
 - 📊 **Advisory Dashboard** — Visual display of current and past recommendations
 - 🗂️ **Advisory History** — Track previous recommendations per farmer/field
 - 🌦️ **Weather Integration** — Fetches live weather data for the farmer's location
-- 🔐 **Role-based Access** — Farmer and Admin views
 
 ---
 
@@ -54,17 +54,17 @@ Design and develop a smart crop advisory system that:
 
 ## 🛠️ Tech Stack
 
-| Layer          | Technology (suggested)                          |
-|----------------|--------------------------------------------------|
-| Frontend       | next.js                                          |
-| Backend        | Python (Flask/FastAPI)                           |
-| ML Model       | Python, scikit-learn / pandas / numpy            |
-| Database       | PostgreSQL                                       |
-| Authentication | JWT-based auth                                   |
-| Deployment     | Docker, Render / Vercel / Railway / AWS          |
-| Weather API    | OpenWeatherMap API (or similar)                  |
+| Layer          | Technology (suggested)                  |
+| -------------- | --------------------------------------- |
+| Frontend       | next.js                                 |
+| Backend        | Python (Flask/FastAPI)                  |
+| ML Model       | Python, scikit-learn / pandas / numpy   |
+| Database       | PostgreSQL                              |
+| Authentication | JWT-based auth                          |
+| Deployment     | Docker, Render / Vercel / Railway / AWS |
+| Weather API    | OpenWeatherMap API (or similar)         |
 
-*(Update this table with the exact stack your team finalizes.)*
+_(Update this table with the exact stack your team finalizes.)_
 
 ---
 
@@ -105,18 +105,21 @@ smart-crop-advisory/
 ## ⚙️ Installation & Setup
 
 ### Prerequisites
+
 - Node.js (v18+)
 - Python (v3.9+)
 - MongoDB / PostgreSQL running locally or a cloud URI
 - npm / pip
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/<your-username>/smart-crop-advisory.git
 cd smart-crop-advisory
 ```
 
 ### 2. Backend Setup
+
 ```bash
 cd backend
 npm install
@@ -125,6 +128,7 @@ npm run dev
 ```
 
 ### 3. ML Model Service Setup
+
 ```bash
 cd ml-model
 pip install -r requirements.txt
@@ -132,6 +136,7 @@ python predict_api.py
 ```
 
 ### 4. Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -155,13 +160,13 @@ The app should now be running at `http://localhost:3000` (frontend) with the bac
 
 ## 🔌 API Endpoints (Sample)
 
-| Method | Endpoint                  | Description                          |
-|--------|----------------------------|---------------------------------------|
-| POST   | `/api/auth/register`      | Register a new farmer                 |
-| POST   | `/api/auth/login`         | Farmer login                          |
-| POST   | `/api/advisory/predict`   | Submit soil/weather data, get advisory|
-| GET    | `/api/advisory/history/:farmerId` | Get past advisories for a farmer |
-| GET    | `/api/weather?location=`  | Fetch live weather for a location     |
+| Method | Endpoint                          | Description                            |
+| ------ | --------------------------------- | -------------------------------------- |
+| POST   | `/api/auth/register`              | Register a new farmer                  |
+| POST   | `/api/auth/login`                 | Farmer login                           |
+| POST   | `/api/advisory/predict`           | Submit soil/weather data, get advisory |
+| GET    | `/api/advisory/history/:farmerId` | Get past advisories for a farmer       |
+| GET    | `/api/weather?location=`          | Fetch live weather for a location      |
 
 ---
 
@@ -177,14 +182,14 @@ The app should now be running at `http://localhost:3000` (frontend) with the bac
 
 ## 👥 Team
 
-| Name | Role |
-|------|------|
-| Aman Pokharia , Ridhima Bhatt   | Frontend |
-| Amrit Raj Yadav , Samarth Chaudhary   | Backend |
-| Kartik Tiwari    | ML |
-| Kartik Sharma   | Database/Deployment |
+| Name                                | Role                |
+| ----------------------------------- | ------------------- |
+| Aman Pokharia , Ridhima Bhatt       | Frontend            |
+| Amrit Raj Yadav , Samarth Chaudhary | Backend             |
+| Kartik Tiwari                       | ML                  |
+| Kartik Sharma                       | Database/Deployment |
 
-*(Fill in your team members and roles.)*
+_(Fill in your team members and roles.)_
 
 ---
 

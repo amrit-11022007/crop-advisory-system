@@ -21,7 +21,6 @@ body {
   padding: 1.5rem;
 }
 
-/* main card – centered login box */
 .login-container {
   display: flex;
   align-items: center;
@@ -65,7 +64,6 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* form */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -119,7 +117,6 @@ body {
   letter-spacing: 0.2px;
 }
 
-/* OTP button */
 .btn-otp {
   border: none;
   padding: 0.95rem 1.5rem;
@@ -150,7 +147,6 @@ body {
   transform: scale(0.97);
 }
 
-/* language selector */
 .language-selector {
   display: flex;
   align-items: center;
@@ -188,7 +184,6 @@ body {
   margin-left: 0.1rem;
 }
 
-/* responsive */
 @media (max-width: 480px) {
   .login-card {
     padding: 2rem 1.5rem 1.5rem;

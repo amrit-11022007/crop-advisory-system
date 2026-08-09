@@ -11,9 +11,30 @@
     />
   </head>
   <body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+        <i class="ri-menu-line"></i>
+      </button>
+      <div class="brand">
+        <h2>Fasal Sathi</h2>
+      </div>
+      <div class="header-spacer"></div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="app-layout">
       <!-- ================= SIDEBAR NAVIGATION ================= -->
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
+        <!-- Close button for mobile -->
+        <div class="sidebar-close-btn">
+          <button id="sidebarCloseBtn" aria-label="Close menu">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
         <div class="brand">
           <h2>Fasal Sathi</h2>
           <p>Crop Advisory</p>
@@ -44,7 +65,7 @@
       </aside>
 
       <!-- ================= MAIN CONTENT CONTAINER ================= -->
-      <main class="main-content">
+      <main class="main-content" id="mainContent">
         <!-- 1. DASHBOARD VIEW -->
         <div id="dashboard-view" class="view-section">
           <header class="header">
@@ -112,7 +133,13 @@
 
         <!-- 2. CROPS VIEW -->
         <div id="crops-view" class="view-section hidden">
-          <!-- Crops content will go here -->
+          <header class="header">
+            <h1>My Crops</h1>
+            <p>Manage and monitor your crop information.</p>
+          </header>
+          <div class="card">
+            <p>Crop management features coming soon.</p>
+          </div>
         </div>
 
         <!-- 3. ADVISORY VIEW -->
@@ -252,6 +279,32 @@
         </div>
       </main>
     </div>
+
+    <!-- Bottom Navigation Bar for Mobile Devices -->
+    <nav class="mobile-bottom-nav">
+      <button data-target="dashboard-view" class="mobile-nav-btn active">
+        <i class="ri-dashboard-line"></i>
+        <span>Dashboard</span>
+      </button>
+      <button data-target="crops-view" class="mobile-nav-btn">
+        <i class="ri-plant-line"></i>
+        <span>Crops</span>
+      </button>
+      <button data-target="advisory-view" class="mobile-nav-btn">
+        <i class="ri-lightbulb-line"></i>
+        <span>Advisory</span>
+      </button>
+      <button data-target="history-view" class="mobile-nav-btn">
+        <i class="ri-history-line"></i>
+        <span>History</span>
+      </button>
+      <button data-target="settings-view" class="mobile-nav-btn">
+        <i class="ri-settings-3-line"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+    <!-- Application JavaScript -->
+    <script src="js/script.js"></script>
   </body>
-  <script src="js/script.js"></script>
 </html>

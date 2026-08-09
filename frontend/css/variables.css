@@ -50,14 +50,9 @@
 
   /* Transitions */
   --transition-default: 0.2s ease;
+  --transition-sidebar: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Misc */
-  --border-width-input: 1.5px;
-  --opacity-white-border: 0.2;
-}
-
-/* App theme variables */
-:root {
+  /* App theme variables */
   --bg-main: #f3f3eb;
   --bg-sidebar: #f8f8f2;
   --bg-card: #ffffff;
