@@ -132,15 +132,229 @@
         </div>
 
         <!-- 2. CROPS VIEW -->
+
         <div id="crops-view" class="view-section hidden">
-          <header class="header">
-            <h1>My Crops</h1>
-            <p>Manage and monitor your crop information.</p>
-          </header>
-          <div class="card">
-            <p>Crop management features coming soon.</p>
-          </div>
+
+    <!-- Page Header -->
+    <header class="header">
+        <h1>Crops directory</h1>
+        <p>Explore agricultural options optimized for your environment.</p>
+    </header>
+
+
+    <!-- ================= RECOMMENDED CROPS ================= -->
+    <section class="recommended-section">
+
+        <h2 class="section-title">Recommended crops</h2>
+
+        <div class="recommended-crops">
+
+            <!-- Wheat -->
+            <div class="crop-card">
+
+                <div class="top-row">
+                    <div class="crop-icon">
+                        <i class="ri-plant-line"></i>
+                    </div>
+
+                    <div class="weather-badge">
+                        <i class="ri-temp-hot-line"></i>
+                        <span>Weather match</span>
+                    </div>
+                </div>
+
+                <div class="crop-detail">
+                    <h3>Wheat</h3>
+                    <p>
+                        Optimal planting window approaching in 14 days
+                        based on soil moisture trends.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Mustard -->
+            <div class="crop-card">
+
+                <div class="top-row">
+                    <div class="crop-icon">
+                        <i class="ri-leaf-line"></i>
+                    </div>
+
+                    <div class="weather-badge">
+                        <i class="ri-temp-hot-line"></i>
+                        <span>Weather match</span>
+                    </div>
+                </div>
+
+                <div class="crop-detail">
+                    <h3>Mustard</h3>
+                    <p>
+                        Highly resilient to current regional pest activity.
+                        Low water requirement.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Chickpea -->
+            <div class="crop-card">
+
+                <div class="top-row">
+                    <div class="crop-icon">
+                        <i class="ri-seedling-line"></i>
+                    </div>
+
+                    <div class="weather-badge">
+                        <i class="ri-temp-hot-line"></i>
+                        <span>Weather match</span>
+                    </div>
+                </div>
+
+                <div class="crop-detail">
+                    <h3>Chickpea</h3>
+                    <p>
+                        Strong historical yield in current temperature
+                        range (15°C - 25°C).
+                    </p>
+                </div>
+
+            </div>
+
         </div>
+
+    </section>
+
+
+
+    <!-- ================= CROP ENCYCLOPEDIA ================= -->
+    <section class="encyclopedia-section">
+
+        <h2 class="section-title">Crop encyclopedia</h2>
+
+
+        <!-- Search Bar -->
+        <div class="crop-search">
+
+            <i class="ri-search-line"></i>
+
+            <input
+                type="text"
+                id="cropSearchInput"
+                placeholder="Search crops by name, family, or season..."
+            >
+
+            <button class="search-mic-btn" title="Voice search">
+                <i class="ri-mic-line"></i>
+            </button>
+
+        </div>
+
+
+
+        <!-- Crop List -->
+        <div class="crop-list">
+
+
+          <!-- Rice -->
+          <div class="small-crop-card">
+
+            <div class="small-crop-icon">
+                <i class="ri-plant-line"></i>
+            </div>
+
+            <div class="small-crop-info">
+                <h3>Rice</h3>
+                <p>High water requirement, Kharif season.</p>
+            </div>
+
+          </div>
+
+
+          <!-- Maize -->
+          <div class="small-crop-card">
+
+              <div class="small-crop-icon">
+                  <i class="ri-plant-line"></i>
+              </div>
+
+              <div class="small-crop-info">
+                  <h3>Maize</h3>
+                  <p>Versatile cereal crop, moderate water.</p>
+              </div>
+
+          </div>
+
+
+          <!-- Soybean -->
+          <div class="small-crop-card">
+
+              <div class="small-crop-icon">
+                  <i class="ri-plant-line"></i>
+              </div>
+
+              <div class="small-crop-info">
+                  <h3>Soybean</h3>
+                  <p>Legume, excellent for soil nitrogen.</p>
+              </div>
+
+          </div>
+
+
+          <!-- Cotton -->
+          <div class="small-crop-card">
+
+              <div class="small-crop-icon">
+                  <i class="ri-plant-line"></i>
+              </div>
+
+              <div class="small-crop-info">
+                  <h3>Cotton</h3>
+                  <p>Cash crop, requires long frost-free period.</p>
+              </div>
+
+          </div>
+
+
+          <!-- Sugarcane -->
+          <div class="small-crop-card">
+
+              <div class="small-crop-icon">
+                  <i class="ri-plant-line"></i>
+              </div>
+
+              <div class="small-crop-info">
+                  <h3>Sugarcane</h3>
+                  <p>Perennial grass, high water needs.</p>
+              </div>
+
+          </div>
+
+
+          <!-- Potato -->
+          <div class="small-crop-card">
+
+              <div class="small-crop-icon">
+                  <i class="ri-plant-line"></i>
+              </div>
+
+              <div class="small-crop-info">
+                  <h3>Potato</h3>
+                  <p>Tuber crop, prefers cool climate.</p>
+              </div>
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+      </div>
+
+
 
         <!-- 3. ADVISORY VIEW -->
         <div id="advisory-view" class="view-section hidden">
