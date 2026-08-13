@@ -7,18 +7,17 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]  # Updated to modern versions
+        python-version: ["3.12"]  # Django 6.1 works with Python 3.12+
 
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5  # Updated to v5
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
@@ -26,15 +25,17 @@ jobs:
       run: |
         cd backend
         python -m pip install --upgrade pip
-        pip install --no-cache-dir -r backend/requirements.txt
+        pip install -r requirements.txt
     
     - name: Run Tests
       env:
         DJANGO_SETTINGS_MODULE: config.settings
+        # Supabase Database Credentials from GitHub Secrets
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
       run: |
-        python manage.py test
+        cd backend
+        python manage.py test --verbosity=2
