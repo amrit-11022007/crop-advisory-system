@@ -1,5 +1,133 @@
 // app.js - Main application functionality with animated mobile sidebar
 document.addEventListener("DOMContentLoaded", () => {
+  // ==================== AUTHENTICATION CHECK ====================
+  const checkAuth = () => {
+    const accessToken = localStorage.getItem("access_token");
+    const refreshToken = localStorage.getItem("refresh_token");
+    const userData = localStorage.getItem("user");
+
+    if (!accessToken || !userData) {
+      // No tokens found, redirect to login
+      window.location.href = "/frontend/login.html";
+      return false;
+    }
+
+    // Optional: Check if token is expired (if you have JWT decode logic)
+    try {
+      const tokenPayload = JSON.parse(atob(accessToken.split(".")[1]));
+      const expirationTime = tokenPayload.exp * 1000; // Convert to milliseconds
+
+      if (Date.now() >= expirationTime) {
+        // Token expired, try to refresh
+        if (refreshToken) {
+          refreshAccessToken(refreshToken);
+          return true;
+        } else {
+          // No refresh token, redirect to login
+          clearAuthData();
+          window.location.href = "/frontend/login.html";
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing token:", error);
+      // If token parsing fails, redirect to login
+      clearAuthData();
+      window.location.href = "/frontend/login.html";
+      return false;
+    }
+
+    return true;
+  };
+
+  // Function to refresh access token
+  const refreshAccessToken = async (refreshToken) => {
+    try {
+      const response = await fetch(
+        "https://your-backend-url.com/api/token/refresh/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refresh: refreshToken,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("access_token", data.access);
+        console.log("Token refreshed successfully");
+        return true;
+      } else {
+        // Refresh failed, clear and redirect
+        clearAuthData();
+        window.location.href = "/frontend/login.html";
+        return false;
+      }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData();
+      window.location.href = "/frontend/login.html";
+      return false;
+    }
+  };
+
+  // Function to clear auth data
+  const clearAuthData = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+  };
+
+  // Function to make authenticated API calls
+  const authenticatedFetch = async (url, options = {}) => {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+      window.location.href = "/frontend/login.html";
+      return null;
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    try {
+      let response = await fetch(url, { ...options, headers });
+
+      // If unauthorized, try to refresh token
+      if (response.status === 401) {
+        const refreshToken = localStorage.getItem("refresh_token");
+        if (refreshToken) {
+          const refreshSuccess = await refreshAccessToken(refreshToken);
+          if (refreshSuccess) {
+            // Retry original request with new token
+            const newAccessToken = localStorage.getItem("access_token");
+            const newHeaders = {
+              ...options.headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            };
+            response = await fetch(url, { ...options, headers: newHeaders });
+          }
+        }
+      }
+
+      return response;
+    } catch (error) {
+      console.error("API call failed:", error);
+      return null;
+    }
+  };
+
+  // ==================== AUTHENTICATION INITIALIZATION ====================
+  if (!checkAuth()) {
+    return; // Stop execution if not authenticated
+  }
+
   const userNameElement = document.getElementById("userName");
   const avatarElement = document.getElementById("avatar");
 
@@ -14,12 +142,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (userNameElement) {
-    const safeUserName = storedUser?.name || storedUser?.username || "Guest";
+    const safeUserName =
+      storedUser?.name ||
+      storedUser?.username ||
+      storedUser?.full_name ||
+      "Guest";
     userNameElement.innerText = safeUserName;
   }
 
   if (avatarElement) {
-    avatarElement.innerText = "G";
+    // Get first letter of user's name for avatar
+    const safeUserName = storedUser?.name || storedUser?.username || "Guest";
+    avatarElement.innerText = safeUserName.charAt(0).toUpperCase();
   }
 
   // ==================== DOM ELEMENTS ====================
@@ -35,6 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const editProfileBtn = document.getElementById("editProfileBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const languageSelect = document.getElementById("languageSelect");
+  const questionInput = document.getElementById("questionInput");
+  const micBtn = document.getElementById("micBtn");
 
   // ==================== SIDEBAR TOGGLE ====================
   function openSidebar() {
@@ -50,19 +186,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Hamburger button to open sidebar
-  hamburgerBtn.addEventListener("click", () => {
-    if (sidebar.classList.contains("open")) {
-      closeSidebar();
-    } else {
-      openSidebar();
-    }
-  });
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", () => {
+      if (sidebar.classList.contains("open")) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
 
   // Close button inside sidebar
-  sidebarCloseBtn.addEventListener("click", closeSidebar);
+  if (sidebarCloseBtn) {
+    sidebarCloseBtn.addEventListener("click", closeSidebar);
+  }
 
   // Close sidebar when clicking overlay
-  sidebarOverlay.addEventListener("click", closeSidebar);
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener("click", closeSidebar);
+  }
 
   // ==================== NAVIGATION HANDLER ====================
   function navigateToView(targetId) {
@@ -94,7 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Scroll to top of main content
-    mainContent.scrollTop = 0;
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    }
     window.scrollTo(0, 0);
 
     // Close sidebar on mobile after navigation
@@ -121,14 +265,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ==================== MARK AS DONE BUTTON ====================
   if (markDoneBtn) {
-    markDoneBtn.addEventListener("click", () => {
+    markDoneBtn.addEventListener("click", async () => {
       const isApplied = markDoneBtn.classList.contains("applied");
 
       if (!isApplied) {
-        markDoneBtn.classList.add("applied");
-        markDoneBtn.innerHTML = '<i class="ri-check-double-line"></i> Applied';
-        markDoneBtn.style.backgroundColor = "#4a7114";
-        markDoneBtn.style.color = "#ffffff";
+        // Optionally save to backend
+        try {
+          const response = await authenticatedFetch(
+            "https://your-backend-url.com/api/mark-done/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ action: "mark_applied" }),
+            },
+          );
+
+          if (response && response.ok) {
+            markDoneBtn.classList.add("applied");
+            markDoneBtn.innerHTML =
+              '<i class="ri-check-double-line"></i> Applied';
+            markDoneBtn.style.backgroundColor = "#4a7114";
+            markDoneBtn.style.color = "#ffffff";
+          }
+        } catch (error) {
+          console.error("Failed to save action:", error);
+        }
       } else {
         markDoneBtn.classList.remove("applied");
         markDoneBtn.innerHTML = '<i class="ri-check-line"></i> Mark as applied';
@@ -140,26 +303,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ==================== SETTINGS FUNCTIONALITY ====================
   if (languageSelect) {
-    languageSelect.addEventListener("change", (e) => {
-      const selectedLanguage = e.target.options[e.target.selectedIndex].text;
+    languageSelect.addEventListener("change", async (e) => {
+      const selectedLanguage = e.target.value;
       console.log(`Language switched to: ${selectedLanguage}`);
-      // You can add actual language switching logic here
+
+      // Save language preference to backend
+      try {
+        const response = await authenticatedFetch(
+          "https://your-backend-url.com/api/user/preferences/",
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ language: selectedLanguage }),
+          },
+        );
+
+        if (response && response.ok) {
+          console.log("Language preference saved");
+        }
+      } catch (error) {
+        console.error("Failed to save language preference:", error);
+      }
     });
   }
 
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", () => {
       alert("Edit Profile modal or action triggered.");
-      // You can add actual edit profile logic here
+      // You can redirect to an edit profile page or open a modal
     });
   }
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
       if (confirm("Are you sure you want to log out?")) {
-        localStorage.removeItem("user");
+        // Optionally call logout endpoint on backend
+        const refreshToken = localStorage.getItem("refresh_token");
+
+        if (refreshToken) {
+          try {
+            await fetch("https://your-backend-url.com/api/logout/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              },
+              body: JSON.stringify({ refresh: refreshToken }),
+            });
+          } catch (error) {
+            console.error("Logout API call failed:", error);
+          }
+        }
+
+        // Clear all auth data
+        clearAuthData();
         console.log("User logged out.");
-        window.location.href = "login.html";
+        window.location.href = "/frontend/login.html";
       }
     });
   }
@@ -174,16 +375,35 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ==================== QUESTION INPUT ====================
-  const questionInput = document.getElementById("questionInput");
-  const micBtn = document.getElementById("micBtn");
-
   if (questionInput) {
-    questionInput.addEventListener("keypress", (e) => {
+    questionInput.addEventListener("keypress", async (e) => {
       if (e.key === "Enter") {
         const question = questionInput.value.trim();
         if (question) {
           console.log("Question asked:", question);
-          // Add your question handling logic here
+
+          // Send question to backend
+          try {
+            const response = await authenticatedFetch(
+              "https://your-backend-url.com/api/ask-question/",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ question: question }),
+              },
+            );
+
+            if (response && response.ok) {
+              const data = await response.json();
+              console.log("Answer received:", data);
+              // Handle the response here
+            }
+          } catch (error) {
+            console.error("Failed to send question:", error);
+          }
+
           questionInput.value = "";
         }
       }
@@ -193,8 +413,34 @@ document.addEventListener("DOMContentLoaded", () => {
   if (micBtn) {
     micBtn.addEventListener("click", () => {
       console.log("Voice input triggered");
-      // Add your voice input logic here
-      alert("Voice input feature coming soon!");
+
+      // Check if browser supports speech recognition
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          if (questionInput) {
+            questionInput.value = transcript;
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error:", event.error);
+        };
+
+        recognition.start();
+      } else {
+        alert("Voice input is not supported in your browser.");
+      }
     });
   }
 

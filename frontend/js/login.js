@@ -30,6 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Store JWT tokens
+        if (data.access) {
+          localStorage.setItem("access_token", data.access);
+        }
+        if (data.refresh) {
+          localStorage.setItem("refresh_token", data.refresh);
+        }
+
+        // Store user data
         const user = data.user || {};
         const safeUser = {
           id: user.id,
@@ -37,8 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
           email: user.email || "",
           name: user.name || user.username || user.email || "",
         };
-
         localStorage.setItem("user", JSON.stringify(safeUser));
+
+        // Store farmer data if available
+        if (data.farmer) {
+          localStorage.setItem("farmer", JSON.stringify(data.farmer));
+        }
 
         alert("Login successful!");
         window.location.href = "index.html";
