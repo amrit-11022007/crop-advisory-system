@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]  # Django 6.1 works with Python 3.12+
+        python-version: ["3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -30,12 +30,20 @@ jobs:
     - name: Run Tests
       env:
         DJANGO_SETTINGS_MODULE: config.settings
-        # Supabase Database Credentials from GitHub Secrets
+        # Supabase credentials from GitHub Secrets
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
+        # Also pass these to ensure CI detection works
+        CI: "true"
+        GITHUB_ACTIONS: "true"
       run: |
         cd backend
+        # Debug: Check if env vars are set
+        echo "DB_HOST: $DB_HOST"
+        echo "DB_NAME: $DB_NAME"
+        echo "DB_USER: $DB_USER"
+        echo "DB_PORT: $DB_PORT"
         python manage.py test --verbosity=2
