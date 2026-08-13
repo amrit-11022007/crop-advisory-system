@@ -57,21 +57,46 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Check if running in CI
+IN_CI = os.getenv('CI', 'false').lower() == 'true' or \
+        os.getenv('GITHUB_ACTIONS', 'false').lower() == 'true'
 
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+# SECURITY WARNING: keep the secret key used in production secret!
+if IN_CI:
+    # Use a fixed key for CI testing (never use this in production!)
+    SECRET_KEY = 'django-insecure-ci-test-key-do-not-use-in-production'
+else:
+    # Use environment variable for local/production
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+    if not SECRET_KEY:
+        raise ValueError("DJANGO_SECRET_KEY environment variable is not set")
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+# Database configuration
+if IN_CI:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'test_db'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'postgres'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            }
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
