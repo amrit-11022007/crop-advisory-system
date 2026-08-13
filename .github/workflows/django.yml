@@ -9,6 +9,23 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # PostgreSQL service container
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     strategy:
       matrix:
         python-version: ["3.12"]
@@ -30,20 +47,17 @@ jobs:
     - name: Run Tests
       env:
         DJANGO_SETTINGS_MODULE: config.settings
-        # Supabase credentials from GitHub Secrets
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        # Also pass these to ensure CI detection works
+        # Local PostgreSQL connection (service container)
+        DB_NAME: test_db
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        DB_HOST: localhost
+        DB_PORT: 5432
+        # This tells Django we're in CI
         CI: "true"
         GITHUB_ACTIONS: "true"
       run: |
         cd backend
-        # Debug: Check if env vars are set
-        echo "DB_HOST: $DB_HOST"
-        echo "DB_NAME: $DB_NAME"
-        echo "DB_USER: $DB_USER"
-        echo "DB_PORT: $DB_PORT"
+        # Wait for PostgreSQL to be ready
+        sleep 5
         python manage.py test --verbosity=2
