@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import secrets
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -7,15 +8,44 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / '.env')
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+# =============================================================================
+# ENVIRONMENT DETECTION
+# =============================================================================
+IS_RENDER = os.getenv('RENDER', 'false').lower() == 'true'
+IS_CI = os.getenv('CI', 'false').lower() == 'true' or \
+        os.getenv('GITHUB_ACTIONS', 'false').lower() == 'true'
+IS_LOCAL = not (IS_RENDER or IS_CI)
 
+# =============================================================================
+# SECURITY
+# =============================================================================
+# Get SECRET_KEY from environment, or generate for CI/Render
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if IS_CI:
+        # Auto-generate for CI (ephemeral environment)
+        SECRET_KEY = 'django-insecure-ci-test-key-do-not-use-in-production'
+    elif IS_RENDER:
+        # Generate a random key for Render if not set (better to set in env)
+        SECRET_KEY = secrets.token_urlsafe(50)
+        print("⚠️ WARNING: Auto-generated SECRET_KEY on Render. Set DJANGO_SECRET_KEY in environment variables for production.")
+    else:
+        raise ValueError("DJANGO_SECRET_KEY environment variable must be set")
 
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+# Allow all hosts in production, or specific ones
+if IS_RENDER:
+    ALLOWED_HOSTS = ['*']  # Update with your Render URL in production
+elif IS_CI:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-
-
+# =============================================================================
+# INSTALLED APPS
+# =============================================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,12 +54,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'api',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'api',
 ]
 
+# =============================================================================
+# REST FRAMEWORK
+# =============================================================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -46,8 +79,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
+# =============================================================================
+# MIDDLEWARE
+# =============================================================================
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,22 +112,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Check if running in CI
-IN_CI = os.getenv('CI', 'false').lower() == 'true' or \
-        os.getenv('GITHUB_ACTIONS', 'false').lower() == 'true'
-
-# SECURITY WARNING: keep the secret key used in production secret!
-if IN_CI:
-    # Use a fixed key for CI testing (never use this in production!)
-    SECRET_KEY = 'django-insecure-ci-test-key-do-not-use-in-production'
-else:
-    # Use environment variable for local/production
-    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-    if not SECRET_KEY:
-        raise ValueError("DJANGO_SECRET_KEY environment variable is not set")
-
-# Database configuration
-if IN_CI:
+# =============================================================================
+# DATABASE
+# =============================================================================
+if IS_CI:
+    # CI: Use local PostgreSQL service container
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -103,23 +128,64 @@ if IN_CI:
         }
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'postgres'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
+    # Production (Render) and Local Development
+    # Try DATABASE_URL first (preferred), then individual variables
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    
+    if DATABASE_URL:
+        # Use dj-database-url if available, otherwise parse manually
+        try:
+            import dj_database_url
+            DATABASES = {
+                'default': dj_database_url.config(
+                    default=DATABASE_URL,
+                    conn_max_age=600,
+                    ssl_require=True,
+                )
+            }
+        except ImportError:
+            # Fallback to manual parsing if dj-database-url not installed
+            # Parse DATABASE_URL manually
+            import re
+            match = re.match(r'postgres(?:ql)?://([^:]+):([^@]+)@([^:/]+)(?::(\d+))?/(.+)', DATABASE_URL)
+            if match:
+                user, password, host, port, dbname = match.groups()
+                DATABASES = {
+                    'default': {
+                        'ENGINE': 'django.db.backends.postgresql',
+                        'NAME': dbname,
+                        'USER': user,
+                        'PASSWORD': password,
+                        'HOST': host,
+                        'PORT': port or '5432',
+                        'OPTIONS': {
+                            'sslmode': 'require',
+                            'connect_timeout': 30,
+                        }
+                    }
+                }
+            else:
+                raise ValueError(f"Invalid DATABASE_URL format: {DATABASE_URL}")
+    else:
+        # Fallback to individual environment variables
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.getenv('DB_NAME', 'postgres'),
+                'USER': os.getenv('DB_USER', 'postgres'),
+                'PASSWORD': os.getenv('DB_PASSWORD'),
+                'HOST': os.getenv('DB_HOST', 'localhost'),
+                'PORT': os.getenv('DB_PORT', '5432'),
+                'OPTIONS': {
+                    'sslmode': 'require',
+                    'connect_timeout': 30,
+                }
             }
         }
-    }
 
-# Password validation
-# https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
-
+# =============================================================================
+# PASSWORD VALIDATION
+# =============================================================================
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -135,31 +201,55 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/6.1/topics/i18n/
-
+# =============================================================================
+# INTERNATIONALIZATION
+# =============================================================================
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.1/howto/static-files/
-
+# =============================================================================
+# STATIC FILES
+# =============================================================================
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# =============================================================================
+# EMAIL
+# =============================================================================
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+# =============================================================================
+# CORS
+# =============================================================================
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+# =============================================================================
+# DEFAULT PRIMARY KEY FIELD
+# =============================================================================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =============================================================================
+# LOGGING (Optional - helps debug)
+# =============================================================================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
     },
 }
-CORS_ALLOW_ALL_ORIGINS = True
