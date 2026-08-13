@@ -24,17 +24,17 @@ jobs:
     
     - name: Install Dependencies
       run: |
+        cd backend
         python -m pip install --upgrade pip
         pip install --no-cache-dir -r backend/requirements.txt
     
     - name: Run Tests
       env:
-        DJANGO_SETTINGS_MODULE: backend.settings
+        DJANGO_SETTINGS_MODULE: config.settings
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
       run: |
-        cd backend
         python manage.py test
