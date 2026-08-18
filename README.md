@@ -40,7 +40,7 @@ Design and develop a smart crop advisory system that:
 ```
 ┌─────────────┐      ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
 │  Frontend   │ ───► │  Backend    │ ───► │   ML Model   │      │  Database   │
-│ (React/HTML)│ ◄─── │ (API Layer) │ ◄─── │  (Crop/Fert. │ ◄──► │ (MongoDB /  │
+│(NextJS/HTML)│ ◄─── │ (API Layer) │ ◄─── │  (Crop/Fert. │ ◄──► │ (MongoDB /  │
 │             │      │             │      │  Prediction) │      │  PostgreSQL)│
 └─────────────┘      └─────────────┘      └──────────────┘      └─────────────┘
 ```
@@ -54,17 +54,15 @@ Design and develop a smart crop advisory system that:
 
 ## 🛠️ Tech Stack
 
-| Layer          | Technology (suggested)                  |
-| -------------- | --------------------------------------- |
-| Frontend       | next.js                                 |
-| Backend        | Python (Flask/FastAPI)                  |
-| ML Model       | Python, scikit-learn / pandas / numpy   |
-| Database       | PostgreSQL                              |
-| Authentication | JWT-based auth                          |
-| Deployment     | Docker, Render / Vercel / Railway / AWS |
-| Weather API    | OpenWeatherMap API (or similar)         |
-
-_(Update this table with the exact stack your team finalizes.)_
+| Layer          | Technology (suggested)                |
+| -------------- | ------------------------------------- |
+| Frontend       | next.js                               |
+| Backend        | Python (Django)                       |
+| ML Model       | Python, scikit-learn / pandas / numpy |
+| Database       | PostgreSQL + MongoDB                  |
+| Authentication | JWT-based auth                        |
+| Deployment     | Render / Vercel / MongoDB Atlas       |
+| Weather API    | openn-meteo API                       |
 
 ---
 
@@ -74,29 +72,31 @@ _(Update this table with the exact stack your team finalizes.)_
 smart-crop-advisory/
 │
 ├── frontend/                 # Client-side application
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── App.js
-│   └── package.json
+│   ├── css/
+│   │   ├── login.css
+│   │   ├── style.css
+│   │   └── variables.css
+│   ├── js/
+│   │   ├── login.js
+│   │   ├── regiser.js
+│   │   └── script.js
+│   ├── index.html             # Main page
+│   ├── login.html
+│   └── register.html
 │
-├── backend/                  # API server
-│   ├── routes/
-│   ├── controllers/
-│   ├── models/                # DB schemas (Farmer, CropData, Advisory)
-│   ├── middleware/            # Auth, validation
-│   └── server.js
+├── backend/                   # API server
+│   ├── api/
+│   ├── config/
+│   ├── db.sqlite3             # DB schemas (Farmer, CropData, Advisory)
+│   ├── requirement.txt        # Auth, validation
+│   └── manage.py
 │
-├── ml-model/                  # ML training & inference
+├── Recommmendation models/    # ML training & inference
 │   ├── dataset/
 │   ├── train_model.py
 │   ├── model.pkl
 │   └── predict_api.py         # Flask/FastAPI service exposing /predict
 │
-├── docs/                       # Reports, diagrams, PPT
-│
-├── .env.example
-├── docker-compose.yml
 └── README.md
 ```
 
@@ -106,10 +106,10 @@ smart-crop-advisory/
 
 ### Prerequisites
 
-- Node.js (v18+)
+- Node.js (v12+)
 - Python (v3.9+)
 - MongoDB / PostgreSQL running locally or a cloud URI
-- npm / pip
+- npm / pnpm + pip
 
 ### 1. Clone the repository
 
@@ -122,9 +122,11 @@ cd smart-crop-advisory
 
 ```bash
 cd backend
-npm install
 cp .env.example .env    # add DB URI, JWT secret, weather API key
-npm run dev
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 ```
 
 ### 3. ML Model Service Setup
@@ -135,12 +137,13 @@ pip install -r requirements.txt
 python predict_api.py
 ```
 
-### 4. Frontend Setup
+### 4. Frontend Setup (for nextjs version)
 
 ```bash
 cd frontend
-npm install
-npm start
+pnpm install
+pnpm build
+pnpm dev
 ```
 
 The app should now be running at `http://localhost:3000` (frontend) with the backend API at `http://localhost:5000` and the ML service at `http://localhost:8000` (adjust ports as configured).
@@ -160,13 +163,10 @@ The app should now be running at `http://localhost:3000` (frontend) with the bac
 
 ## 🔌 API Endpoints (Sample)
 
-| Method | Endpoint                          | Description                            |
-| ------ | --------------------------------- | -------------------------------------- |
-| POST   | `/api/auth/register`              | Register a new farmer                  |
-| POST   | `/api/auth/login`                 | Farmer login                           |
-| POST   | `/api/advisory/predict`           | Submit soil/weather data, get advisory |
-| GET    | `/api/advisory/history/:farmerId` | Get past advisories for a farmer       |
-| GET    | `/api/weather?location=`          | Fetch live weather for a location      |
+| Method | Endpoint             | Description           |
+| ------ | -------------------- | --------------------- |
+| POST   | `/api/auth/register` | Register a new farmer |
+| POST   | `/api/auth/login`    | Farmer login          |
 
 ---
 
@@ -182,17 +182,16 @@ The app should now be running at `http://localhost:3000` (frontend) with the bac
 
 ## 👥 Team
 
-| Name                                | Role                |
-| ----------------------------------- | ------------------- |
-| Aman Pokharia , Ridhima Bhatt       | Frontend            |
-| Amrit Raj Yadav , Samarth Chaudhary | Backend             |
-| Kartik Tiwari                       | ML                  |
-| Kartik Sharma                       | Database/Deployment |
-
-_(Fill in your team members and roles.)_
+| Name                          | Role                |
+| ----------------------------- | ------------------- |
+| Aman Pokharia , Ridhima Bhatt | Frontend            |
+| Samarth Chaudhary             | Backend             |
+| Amrit Raj Yadav               | Full Stack          |
+| Kartik Tiwari                 | ML                  |
+| Kartik Sharma                 | Database/Deployment |
 
 ---
 
 ## 📄 License
 
-This project is developed for **Smart India Hackathon (SIH) 2025** as an educational/practice submission under problem statement **SIH25010**.
+This project is available under MIT Licence.
